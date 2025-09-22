@@ -89,10 +89,20 @@ curl -X POST http://localhost:8080/PericoVerde/api/clientes \
   -H "Content-Type: application/json" \
   -d '{"nombre":"Ana","apellido_paterno":"López","apellido_materno":"García","genero":"F"}'
 
-📸 Capturas de pantalla
-|---|---|---| | ![Login](web/Frontend/login.png) | ![Menú](web/Frontend/menu.png) | ![Formulario](web/Frontend/formulario.png) | | Lista General | Registro de Entrada | Listado Entradas/Salidas | 
-|---|---|---| | ![Lista](web/Frontend/lista.png) | ![Registro de Entrada](web/Frontend/registroEntrada.png) | ![Entradas/Salidas](web/Frontend/listaEntradasSalidas.png) |
-	
+## 📸 Capturas de pantalla
+
+
+
+| Login | Menú | Formulario |
+|---|---|---|
+| ![Login](web/Frontend/login.png) | ![Menú](web/Frontend/menu.png) | ![Formulario](web/Frontend/formulario.png) |
+
+| Lista General | Registro de Entrada | Listado Entradas/Salidas |
+|---|---|---|
+| ![Lista](web/Frontend/lista.png) | ![Registro de Entrada](web/Frontend/registroEntrada.png) | ![Entradas/Salidas](web/Frontend/listaEntradasSalidas.png) |
+
+
+
 🔒 Seguridad
 
 Autenticación básica de usuarios/login
