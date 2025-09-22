@@ -90,13 +90,8 @@ curl -X POST http://localhost:8080/PericoVerde/api/clientes \
   -d '{"nombre":"Ana","apellido_paterno":"López","apellido_materno":"García","genero":"F"}'
 
 📸 Capturas de pantalla
-Login	Menú	Formulario
-
-	
-	
-Lista General	Registro de Entrada	Listado Entradas/Salidas
-
-	
+|---|---|---| | ![Login](web/Frontend/login.png) | ![Menú](web/Frontend/menu.png) | ![Formulario](web/Frontend/formulario.png) | | Lista General | Registro de Entrada | Listado Entradas/Salidas | 
+|---|---|---| | ![Lista](web/Frontend/lista.png) | ![Registro de Entrada](web/Frontend/registroEntrada.png) | ![Entradas/Salidas](web/Frontend/listaEntradasSalidas.png) |
 	
 🔒 Seguridad
 
