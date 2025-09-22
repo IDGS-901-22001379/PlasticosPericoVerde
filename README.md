@@ -1,6 +1,6 @@
 Plásticos Perico Verde — Gestión de Entradas y Salidas
 
-Sistema de gestión empresarial desarrollado en Java con APIs REST para administrar clientes, empleados, proveedores y asistencias (horarios), además del control de entradas y salidas de información. Incluye frontend web con HTML, CSS y Bootstrap y persistencia en MySQL.
+Sistema de gestión empresarial desarrollado en Java con APIs REST para administrar clientes, empleados, proveedores y asistencias (horarios), además del control de entradas y salidas. Incluye frontend web con HTML, CSS y Bootstrap y persistencia en MySQL.
 
 🚀 Tecnologías principales
 
@@ -14,61 +14,37 @@ Frontend: HTML, CSS, Bootstrap, JavaScript
 
 Servidor: Apache Tomcat (WAR)
 
-IDE recomendado: NetBeans
+IDE: NetBeans
 
 📦 Módulos del sistema
 
-Usuarios/Login: autenticación básica.
+Usuarios/Login: autenticación básica
 
-Clientes: registro, edición, consulta y baja.
+Clientes: registro, edición, consulta y baja
 
-Proveedores: catálogo y administración.
+Proveedores: catálogo y administración
 
-Empleados: registro, códigos de empleado y contacto.
+Empleados: registro, códigos de empleado y contacto
 
-Asistencias/Horarios: registro de entradas/salidas por fecha.
+Asistencias/Horarios: registro de entradas y salidas
 
-Inicio (Dashboard simple): acceso a módulos.
+Dashboard: acceso a los módulos principales
 
-🧭 Arquitectura (resumen)
+🧭 Arquitectura
 
-Modelo (POJOs): org.pericoVerde.model.* (Cliente, Empleado, Proveedor, Asistencia, Usuario)
+Modelo (POJOs): org.pericoVerde.model.*
 
-Controladores (DAO/Logica): org.pericoVerde.controller.*
+Controladores (DAO/Lógica): org.pericoVerde.controller.*
 
-REST (JAX-RS): org.pericoVerde.rest.* (expone JSON)
+REST (JAX-RS): org.pericoVerde.rest.*
 
 Persistencia: org.pericoVerde.bd.ConexionMySQL
 
-Web (UI): /web/sistemaPericoVerde/* (HTML + Bootstrap + JS)
+Web (UI): /web/sistemaPericoVerde/*
 
-🗂️ Estructura relevante del repo
-BD/
- ├─ BD FINAL pericoV/
- │   ├─ BDfinalPericoVerde.tsql           # Creación de BD/tablas
- │   ├─ ProcerurePericoVerde.tsql         # Procedimientos almacenados
- │   ├─ VistasPericoVerde.tsql            # Vistas de apoyo
- │   └─ inserts.txt                       # Datos de ejemplo
-src/java/org/pericoVerde/
- ├─ bd/ConexionMySQL.java
- ├─ model/ (POJOs)
- ├─ controller/ (lógica/DAO)
- └─ rest/ (REST JAX-RS: Cliente, Empleado, Proveedor, Asistencia, Login)
-web/
- ├─ index.html
- ├─ sistemaPericoVerde/
- │   ├─ inicioPericoVerde.html
- │   ├─ moduloClientes/vistaClientes.html
- │   ├─ moduloEmpleados/vistaEmpleado.html
- │   ├─ moduloProveedores/vistaProveedores.html
- │   └─ moduloHorarios/vistaHorarios.html
- ├─ estilos/bootstrap/*                   # Bootstrap local
- └─ js/*.js                               # JS de módulos
-dist/PericoVerde.war                      # Artefacto desplegable
+🔌 Endpoints REST
 
-🔌 Endpoints REST (ejemplos)
-
-Base sugerida: http://localhost:8080/PericoVerde/api/
+Base: http://localhost:8080/PericoVerde/api/
 
 Login
 
@@ -82,11 +58,11 @@ POST /clientes — PUT /clientes/{id} — DELETE /clientes/{id}
 
 Proveedores
 
-GET /proveedores ... CRUD completo
+GET /proveedores — CRUD completo
 
 Empleados
 
-GET /empleados ... CRUD completo
+GET /empleados — CRUD completo
 
 Asistencias
 
@@ -94,94 +70,42 @@ GET /asistencias?fecha=YYYY-MM-DD
 
 POST /asistencias (codigoEmpleado, fecha, horaEntrada, horaSalida)
 
-Formato: JSON.
-Notas: Ajusta la ruta base según tu web.xml y/o Application de JAX-RS.
-
 ⚙️ Configuración y despliegue
 
-Base de datos (MySQL)
+Crear la base de datos en MySQL con los scripts de BD/BD FINAL pericoV/.
 
-Crear BD y objetos:
+Actualizar credenciales en ConexionMySQL.java.
 
-SOURCE "BD/BD FINAL pericoV/BDfinalPericoVerde.tsql";
-SOURCE "BD/BD FINAL pericoV/ProcerurePericoVerde.tsql";
-SOURCE "BD/BD FINAL pericoV/VistasPericoVerde.tsql";
-SOURCE "BD/BD FINAL pericoV/inserts.txt";
+Generar el WAR (dist/PericoVerde.war) y desplegarlo en Tomcat.
 
+Acceder desde: http://localhost:8080/PericoVerde/
 
-Verifica usuario/contraseña y permisos (CREATE, SELECT, INSERT, UPDATE, DELETE).
-
-Conexión a MySQL
-
-Actualiza credenciales en:
-
-src/java/org/pericoVerde/bd/ConexionMySQL.java y/o
-
-web/META-INF/context.xml (si usas DataSource)
-
-Incluye el conector MySQL en WEB-INF/lib (ya se incluye en el repo).
-
-Compilar y ejecutar
-
-Genera el WAR (dist/PericoVerde.war) con NetBeans o Ant.
-
-Despliega en Tomcat: copiar dist/PericoVerde.war a tomcat/webapps/.
-
-Abre: http://localhost:8080/PericoVerde/
-
-🧪 Pruebas rápidas (curl)
+🧪 Pruebas rápidas
 # Listar clientes
 curl -X GET http://localhost:8080/PericoVerde/api/clientes
 
 # Crear cliente
 curl -X POST http://localhost:8080/PericoVerde/api/clientes \
   -H "Content-Type: application/json" \
-  -d '{"nombre":"Ana","apellido_paterno":"López","apellido_materno":"García","genero":"F", ... }'
+  -d '{"nombre":"Ana","apellido_paterno":"López","apellido_materno":"García","genero":"F"}'
 
-🖼️ UI (Bootstrap)
+📸 Capturas de pantalla
+Login	Menú	Formulario
 
-Páginas HTML listas en web/sistemaPericoVerde/*
+	
+	
+Lista General	Registro de Entrada	Listado Entradas/Salidas
 
-Bootstrap local en web/estilos/bootstrap/
+	
+	
+🔒 Seguridad
 
-JS por módulo: web/sistemaPericoVerde/js/*.js
+Autenticación básica de usuarios/login
 
-
-## 📸 Capturas de pantalla
-
-
-
-| Login | Menú | Formulario |
-|---|---|---|
-| ![Login](web/Frontend/login.png) | ![Menú](web/Frontend/menu.png) | ![Formulario](web/Frontend/formulario.png) |
-
-| Lista General | Registro de Entrada | Listado Entradas/Salidas |
-|---|---|---|
-| ![Lista](web/Frontend/lista.png) | ![Registro de Entrada](web/Frontend/registroEntrada.png) | ![Entradas/Salidas](web/Frontend/listaEntradasSalidas.png) |
-
-> Nota: Los nombres de archivo son **sensibles a mayúsculas/minúsculas**. Verifica que coincidan exactamente.
-
-
-🔒 Seguridad (nota breve)
-
-Credenciales de BD no deben quedar en el repo para producción.
-
-Considera variables de entorno o JNDI DataSource para despliegues reales.
-
-Habilita CORS y validaciones de entrada si expones el API públicamente.
-
-🗺️ Roadmap corto
-
- Reportes (PDF/Excel) de clientes, proveedores y asistencias
-
- Roles y permisos (administrador/operador)
-
- Filtros avanzados por fecha/rango en asistencias
-
- Tests de integración para REST
+Validación de entradas en APIs
 
 👤 Autor
 
 Yael López Mariano
-Proyecto para empresa: Plásticos Perico Verde
+Proyecto empresarial: Plásticos Perico Verde
 Stack: Java, REST, MySQL, HTML, CSS, Bootstrap, JS
