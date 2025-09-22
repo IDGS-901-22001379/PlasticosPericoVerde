@@ -146,9 +146,21 @@ Bootstrap local en web/estilos/bootstrap/
 
 JS por módulo: web/sistemaPericoVerde/js/*.js
 
-Puedes agregar capturas en el README:
-![Inicio](web/recursos/pericoVerde.png)
-![Clientes](web/recursos/vistaEmp.png)
+
+## 📸 Capturas de pantalla
+
+
+
+| Login | Menú | Formulario |
+|---|---|---|
+| ![Login](web/Frontend/login.png) | ![Menú](web/Frontend/menu.png) | ![Formulario](web/Frontend/formulario.png) |
+
+| Lista General | Registro de Entrada | Listado Entradas/Salidas |
+|---|---|---|
+| ![Lista](web/Frontend/lista.png) | ![Registro de Entrada](web/Frontend/registroEntrada.png) | ![Entradas/Salidas](web/Frontend/listaEntradasSalidas.png) |
+
+> Nota: Los nombres de archivo son **sensibles a mayúsculas/minúsculas**. Verifica que coincidan exactamente.
+
 
 🔒 Seguridad (nota breve)
 
