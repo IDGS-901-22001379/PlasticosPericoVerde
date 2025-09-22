@@ -1,0 +1,1391 @@
+----------------------------------------------------------------Base de Datos Usuarios---------------------------------
+USE pericoVerde;
+
+INSERT INTO usuarios (nombre_usuario, contrasenia) 
+VALUES ('Elizabeth', 'elizabeth17');
+
+INSERT INTO usuarios (nombre_usuario, contrasenia) 
+VALUES ('Laura', 'laura01');
+
+INSERT INTO usuarios (nombre_usuario, contrasenia) 
+VALUES ('Moises', 'moicontreras');
+
+
+
+
+
+----------------------------------------------------------------- Controlador asistencias---------------------------------
+
+
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package org.pericoVerde.controller;
+
+import org.pericoVerde.model.Asistencia;
+
+/**
+ *
+ * @author Crepa
+ */
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+import org.pericoVerde.bd.ConexionMySQL;
+
+public class ControllerAsistencia {
+
+    public int registrarEntrada(int codigoEmpleado, String horaEntrada) throws Exception {
+        if (!existeCodigoEmpleado(codigoEmpleado)) {
+            return -1; // Código de empleado no existe
+        }
+
+        if (existeEntradaParaEmpleado(codigoEmpleado)) {
+            return 0; // Ya existe una entrada para el empleado en la fecha actual
+        }
+
+        ConexionMySQL connMySQL = new ConexionMySQL();
+        Connection conn = connMySQL.open();
+        PreparedStatement stmt = null;
+        conn.setAutoCommit(false);
+
+        try {
+            String sql = "INSERT INTO Asistencias (codigoEmpleado, fecha, horaEntrada) VALUES (?, CURDATE(), ?)";
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, codigoEmpleado);
+            stmt.setString(2, horaEntrada); // Usar la hora proporcionada
+            stmt.executeUpdate();
+            conn.commit();
+            return 1;
+        } catch (SQLException se) {
+            if (conn != null) {
+                conn.rollback();
+            }
+            se.printStackTrace();
+            return 0;
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    public int registrarSalida(int codigoEmpleado, String horaSalida) throws Exception {
+        if (!existeCodigoEmpleado(codigoEmpleado)) {
+            return -1; // Código de empleado no existe
+        }
+
+        ConexionMySQL connMySQL = new ConexionMySQL();
+        Connection conn = connMySQL.open();
+        PreparedStatement stmt = null;
+        conn.setAutoCommit(false);
+
+        try {
+            String sql = "UPDATE Asistencias SET horaSalida = ? WHERE codigoEmpleado = ? AND fecha = CURDATE() AND horaSalida IS NULL";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, horaSalida); // Usar la hora proporcionada
+            stmt.setInt(2, codigoEmpleado);
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated == 0) {
+                conn.rollback();
+                return -1;
+            }
+            conn.commit();
+            return 1;
+        } catch (SQLException se) {
+            if (conn != null) {
+                conn.rollback();
+            }
+            se.printStackTrace();
+            return 0;
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    private boolean existeCodigoEmpleado(int codigoEmpleado) throws Exception {
+        ConexionMySQL connMySQL = new ConexionMySQL();
+        Connection conn = connMySQL.open();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            System.out.println(codigoEmpleado);
+            System.out.println("hola");
+            String sql = "SELECT COUNT(*) FROM empleados WHERE codigo_empleado = ?";
+            System.out.println(sql);
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, codigoEmpleado);
+            System.out.println(stmt);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count > 0;
+            }
+            return false;
+        } catch (SQLException se) {
+            se.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+    }
+
+    private boolean existeEntradaParaEmpleado(int codigoEmpleado) throws Exception {
+        ConexionMySQL connMySQL = new ConexionMySQL();
+        Connection conn = connMySQL.open();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String sql = "SELECT COUNT(*) FROM Asistencias WHERE codigoEmpleado = ? AND fecha = CURDATE()";
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, codigoEmpleado);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count > 0;
+            }
+            return false;
+        } catch (SQLException se) {
+            se.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+    }
+
+    public List<Asistencia> getAllHorarios() throws Exception {
+        String sql = "SELECT * FROM v_Horarios";
+
+        ConexionMySQL connMySQL = new ConexionMySQL();
+        Connection conn = connMySQL.open();
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+
+        ArrayList<Asistencia> horarios = new ArrayList<>();
+
+        while (rs.next()) {
+            Asistencia asistencia = fill(rs);
+            horarios.add(asistencia);
+        }
+        rs.close();
+        pstmt.close();
+        conn.close();
+
+        return horarios;
+    }
+
+    private Asistencia fill(ResultSet rs) throws Exception {
+        Asistencia a = new Asistencia();
+
+        a.setIdAsistencia(rs.getInt("idAsistencia"));
+        a.setCodigoEmpleado(rs.getInt("codigoEmpleado"));
+        a.setNombre(rs.getString("nombre"));
+        a.setApellidoPaterno(rs.getString("apellido_paterno"));
+        a.setApellidoMaterno(rs.getString("apellido_materno"));
+        a.setPuesto(rs.getString("puesto"));
+        a.setFecha(rs.getString("fecha"));
+        a.setHoraEntrada(rs.getString("horaEntrada"));
+        a.setHoraSalida(rs.getString("horaSalida"));
+
+        return a;
+    }
+}
+
+
+
+
+---------------------------------------------------------------------------REST Asistencias-------------------------------
+
+
+
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package org.pericoVerde.rest;
+
+/**
+ *
+ * @author Crepa
+ */
+import com.google.gson.Gson;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import java.util.List;
+import org.pericoVerde.controller.ControllerAsistencia;
+import org.pericoVerde.model.Asistencia;
+
+@Path("asistencia")
+public class RESTAsistencia {
+    @Path("entrada")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response registrarEntrada(
+        @FormParam("codigoEmpleado") @DefaultValue("0") int codigoEmpleado,
+        @FormParam("hora") @DefaultValue("") String horaEntrada
+    ) {
+        ControllerAsistencia ca = new ControllerAsistencia();
+        String out = null;
+        try {
+            int resultado = ca.registrarEntrada(codigoEmpleado, horaEntrada);
+            if (resultado == -1) {
+                out = "{\"result\":\"Código de empleado no existe.\"}";
+            } else {
+                out = "{\"result\":\"Entrada registrada correctamente.\"}";
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            out = String.format("{\"exception\":\"Ocurrió un error en el servidor al registrar la entrada. %s\"}", ex.toString().replaceAll("\"", ""));
+        }
+        return Response.ok(out).build();
+    }
+
+    @Path("salida")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response registrarSalida(
+        @FormParam("codigoEmpleado") @DefaultValue("0") int codigoEmpleado,
+        @FormParam("hora") @DefaultValue("") String horaSalida
+    ) {
+        ControllerAsistencia ca = new ControllerAsistencia();
+        String out = null;
+        try {
+            int resultado = ca.registrarSalida(codigoEmpleado, horaSalida);
+            if (resultado == -1) {
+                out = "{\"result\":\"Código de empleado no existe o no hay entrada registrada.\"}";
+            } else {
+                out = "{\"result\":\"Salida registrada correctamente.\"}";
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            out = String.format("{\"exception\":\"Ocurrió un error en el servidor al registrar la salida. %s\"}", ex.toString().replaceAll("\"", ""));
+        }
+        return Response.ok(out).build();
+    }
+
+    
+    @Path("getAll")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllHorarios() {
+        ControllerAsistencia ca = new ControllerAsistencia();
+        List<Asistencia> horarios = null;
+        String out = null;
+        Gson gson = new Gson();
+        try {
+            horarios = ca.getAllHorarios();
+            out = gson.toJson(horarios);
+        } catch (Exception e) {
+            e.printStackTrace();
+            out = "{\"exception\":\"" + e.toString().replaceAll("\"", "") + "\"}";
+        }
+        return Response.ok(out).build();
+    }
+}
+
+
+
+
+
+--------------------------------------------------------------------------------- Index -------------------------------------
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Login</title>
+    <!-- Agregar referencias de Bootstrap -->
+    <link rel="stylesheet" href="estilos/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="estilos/bootstrap/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        body {
+            background-image: url('recursos/pericoVerde.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .card-login {
+            background-image: url('recursos/imagenDesenfocada.png');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            position: relative;
+            top: 300px;
+            left: 50px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .card-login .card-body {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+        .card-title {
+            font-size: 38px;
+        }
+        .form-control {
+            border-radius: 25px;
+        }
+        .btn-ingresar {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body style="background-color: #a9cce3">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card card-login font-weight-bold">
+                    <div class="card-body">
+                        <h5 class="card-title text-center font-weight-bold">
+                            <i class=""></i>Bienvenidos
+                        </h5>
+                        <form>
+                            <div class="form-group">
+                                <label for="usuario">
+                                    <i class="fas fa-user mr-2"></i>Usuario
+                                </label>
+                                <input type="text" class="form-control" id="txtUsuario" placeholder="Ingrese su usuario">
+                            </div>
+                            <div class="form-group">
+                                <label for="contrasena">
+                                    <i class="fas fa-lock mr-2"></i>Contraseña
+                                </label>
+                                <input type="password" class="form-control" id="txtContrasenia" placeholder="Ingrese su contraseña">
+                            </div>
+                            <div class="text-center">
+                                <button id="btnLogin" type="button" class="btn btn-outline-light px-4 my-2 font-weight-bold btn-ingresar" onclick="login();">
+                                    <i class="fas fa-sign-in-alt"></i> Ingresar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/login.js"></script>
+    <script src="estilos/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+
+----------------------------------------------------------------------------- LOGIN.JS--------------------------------
+
+
+
+// Función login que realiza la autenticación
+async function login() {
+    let url = "http://localhost:8080/PericoVerde/api/login/validar?";
+    let usuario = document.getElementById("txtUsuario").value;
+    let contrasenia = document.getElementById("txtContrasenia").value;
+
+    // Construcción de la URL con los parámetros
+    url += "nombreUsuario=" + encodeURIComponent(usuario) + "&contrasenia=" + encodeURIComponent(contrasenia);
+
+    try {
+        let resp = await fetch(url);
+        if (!resp.ok) {
+            throw new Error(`HTTP error! status: ${resp.status}`);
+        }
+        let data = await resp.json();
+
+        if (data.exception != null) {
+            Swal.fire('', 'Ocurrió un error interno. Intente más tarde.', 'error');
+            return;
+        }
+        if (data.error != null) {
+            if (data.error === "Usuario o contraseña incorrectos") {
+                Swal.fire('Error', 'Usuario o contraseña incorrectos.', 'warning');
+            } else {
+                Swal.fire('Error', data.error, 'warning');
+            }
+            return;
+        }
+
+        // Si no hay errores, mostrar alerta de bienvenida
+        Swal.fire({
+            title: 'Bienvenido',
+            text: `Hola ${usuario}, has iniciado sesión correctamente.`,
+            icon: 'success',
+            confirmButtonText: 'Continuar'
+        }).then(() => {
+            // Redirigir a la página de inicio después de que el usuario cierre la alerta
+            window.location.replace('sistemaPericoVerde/inicioPericoVerde.html');
+        });
+
+    } catch (error) {
+        console.error('Error en el try:', error);
+        Swal.fire('Error', 'Ocurrió un error. Por favor, inténtelo de nuevo.', 'error');
+    }
+}
+
+
+
+
+
+---------------------------------------------------------------------------------------------SstemaPericoVerde.HTML-----
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Plásticos y Jarciería El Perico Verde</title>
+        <!-- Bootstrap -->
+        <link href="../estilos/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" type="text/css">
+        <link href="../estilos/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <!-- Iconos -->
+        <link href="../recursos/iconos/css/brands.css" rel="stylesheet" type="text/css">
+        <link href="../recursos/iconos/css/fontawesome.css" rel="stylesheet" type="text/css">
+        <link href="../recursos/iconos/css/solid.css" rel="stylesheet" type="text/css">
+        <!-- Iconos (usando CDN) -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+        <!-- Fuente personalizada -->
+        <link href="https://fonts.googleapis.com/css2?family=More+Sugar&display=swap" rel="stylesheet">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+
+        <!-- Custom Styles -->
+        <link rel="stylesheet" href="styles.css" />
+        <script src="js/inicioPericoVerde.js" type="text/javascript"></script>
+        <style>
+            body {
+                background-image: url('../recursos/PLASTICOS Y JARCIERIA.png');
+                background-size: cover;
+                background-repeat: no-repeat;
+                font-family: 'More Sugar', cursive;
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+                position: relative;
+            }
+            .navbar-custom {
+                background-color: #99CBA7;
+                border-radius: 15px;
+                margin-top: 15px;
+                width: fit-content;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 10px;
+            }
+            .navbar-nav {
+                margin: 0 auto;
+            }
+            .nav-link {
+                position: relative;
+                padding: 10px 15px;
+                transition: all 0.3s ease;
+                font-size: 18px;
+                color: #ffffff;
+            }
+            .nav-link::after {
+                content: '';
+                position: absolute;
+                left: 50%;
+                bottom: 0;
+                width: 0;
+                height: 3px;
+                background-color: #ffffff;
+                transition: all 0.3s ease;
+                transform: translateX(-50%);
+            }
+            .nav-link:hover::after {
+                width: 100%;
+            }
+            .about-section {
+                margin-top: 30px;
+            }
+            .about-section h2 {
+                color: #4CAF50;
+            }
+            .about-section p {
+                text-align: justify;
+            }
+            .custom-header {
+                background-color: #99CBA7;
+                padding: 15px 0;
+            }
+            h1 {
+                font-weight: bold;
+                color: #ffffff;
+                font-size: 3rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-top: 30px;
+                margin-bottom: 20px;
+                background-color: #99CBA7;
+                border-radius: 15px;
+                padding: 10px;
+            }
+            .btn-salir {
+                color: #ffffff;
+                background-color: #4CAF50;
+                border: none;
+            }
+            .btn-salir:hover {
+                background-color: #45a049;
+            }
+            .carousel-item {
+                text-align: justify;
+            }
+            .carousel-caption {
+                background-color: rgba(0, 0, 0, 0.5);
+                color: #ffffff;
+                padding: 20px;
+            }
+            .carousel-control-prev-icon, .carousel-control-next-icon {
+                background-color: black;
+            }
+            .carousel-control-prev, .carousel-control-next {
+                width: auto;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: none;
+                border: none;
+                margin: 0;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 1;
+            }
+            .carousel-control-prev {
+                left: -50px;
+            }
+            .carousel-control-next {
+                right: -50px;
+            }
+            .carousel-control-prev-icon, .carousel-control-next-icon {
+                background-color: black;
+                width: 30px;
+                height: 30px;
+                background-size: 100%, 100%;
+                border-radius: 50%;
+                z-index: 2;
+            }
+            .contenedor {
+                max-width: 900px;
+                margin: auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 10px;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            }
+            .contenedor-formulario {
+                margin-bottom: 40px;
+            }
+            .form-label {
+                font-weight: bold;
+            }
+            .form-control,
+            .form-select {
+                border-radius: 5px;
+            }
+            .button-container {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 20px;
+            }
+            .btn-custom {
+                background-color: #4CAF50;
+                color: #ffffff;
+                border: none;
+            }
+            .btn-custom:hover {
+                background-color: #45a049;
+            }
+            .btn-danger {
+                background-color: #d9534f;
+                color: #ffffff;
+                border: none;
+            }
+            .btn-danger:hover {
+                background-color: #c9302c;
+            }
+            .table-container {
+                margin-top: 20px;
+            }
+            footer {
+                background-color: #99CBA7;
+                color: #ffffff;
+                text-align: center;
+                padding: 10px;
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+            }
+
+
+
+            .portfolio-experiment {
+                position: absolute; /* Posición absoluta para colocar en la esquina */
+                top: 10px; /* Ajusta la distancia desde la parte superior */
+                right: 10px; /* Ajusta la distancia desde la parte derecha */
+                background: transparent;
+            }
+
+            .portfolio-experiment a {
+                color: black;
+                font-weight: bold;
+                padding: 10px 20px;
+                display: inline-block;
+                border: 2px solid transparent;
+                position: relative;
+                font-size: 1.2em;
+                cursor: pointer;
+                letter-spacing: 0.07em;
+                text-decoration: none;
+            }
+
+            .portfolio-experiment a .text {
+                font-family: Arial, sans-serif;
+                transform: translate3d(0, 10px, 0);
+                display: block;
+                transition: transform 0.4s cubic-bezier(.2, 0, 0, 1) 0.4s;
+            }
+
+            .portfolio-experiment a:after {
+                position: absolute;
+                content: '';
+                bottom: -2px;
+                left: 10px;
+                right: 10px;
+                height: 2px;
+                background: #00ff00; /* Línea verde */
+                transition:
+                    transform 0.8s cubic-bezier(1, 0, .37, 1) 0.2s,
+                    right 0.2s cubic-bezier(.04, .48, 0, 1) 0.6s,
+                    left 0.4s cubic-bezier(.04, .48, 0, 1) 0.6s;
+                transform-origin: left;
+            }
+
+            .portfolio-experiment a .line {
+                position: absolute;
+                background: #00ff00; /* Verde */
+            }
+
+            .portfolio-experiment a .line.-right,
+            .portfolio-experiment a .line.-left {
+                width: 2px;
+                bottom: -2px;
+                top: -2px;
+                transform: scale3d(1, 0, 1);
+            }
+
+            .portfolio-experiment a .line.-top,
+            .portfolio-experiment a .line.-bottom {
+                height: 2px;
+                left: -2px;
+                right: -2px;
+                transform: scale3d(0, 1, 1);
+            }
+
+            .portfolio-experiment a:hover .text {
+                transform: translate3d(0, 0, 0);
+                transition: transform 0.6s cubic-bezier(.2, 0, 0, 1) 0.4s;
+            }
+
+            .portfolio-experiment a:hover:after {
+                transform: scale3d(0, 1, 1);
+                right: -2px;
+                left: -2px;
+                transform-origin: right;
+                transition:
+                    transform 0.2s cubic-bezier(1, 0, .65, 1.01) 0.17s,
+                    right 0.2s cubic-bezier(1, 0, .65, 1.01),
+                    left 0s 0.3s;
+            }
+
+            .portfolio-experiment a:hover .line {
+                transform: scale3d(1, 1, 1);
+            }
+
+            .portfolio-experiment a:hover .line.-right {
+                transition: transform 0.1s cubic-bezier(1, 0, .65, 1.01) 0.2s;
+            }
+
+            .portfolio-experiment a:hover .line.-top {
+                transition: transform 0.08s linear 0.4s;
+            }
+
+            .portfolio-experiment a:hover .line.-left {
+                transition: transform 0.08s linear 0.48s;
+            }
+
+            .portfolio-experiment a:hover .line.-bottom {
+                transition: transform 0.5s cubic-bezier(0, .53, .29, 1) 0.56s;
+            }
+
+
+
+
+
+        </style>
+    </head>
+    <body>
+        <header class="custom-header py-3">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0 text-center flex-grow-1">PLÁSTICOS Y JARCERÍA EL PERICO VERDE</h1>
+                <!-- Botón para regresar -->
+                <section class="portfolio-experiment">
+                    <a href="#" onclick="cerrarSesion()">
+                        <span class="text">Cerrar Sesión</span>
+                        <span class="line -right"></span>
+                        <span class="line -top"></span>
+                        <span class="line -left"></span>
+                        <span class="line -bottom"></span>
+                    </a>
+                </section>
+
+                <!-- cambio  <button type="button" class="btn btn-salir ms-auto">Salir</button>  -->
+            </div>
+        </header>
+
+        <nav class="navbar navbar-expand-lg navbar-custom">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="cargarModuloEmpleados()">Empleados</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="cargarModuloClientes()">Clientes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="cargarModuloProveedores()">Proveedores</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="cargarModuloHorarios()">Horarios</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="container-fluid d-flex justify-content-center align-content-center my-1" id="contenedorPrincipal" class="contenedor-formulario">
+                    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="container about-section">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h2>Acerca de la Empresa</h2>
+                                            <p>Plásticos y Jarciería El Perico Verde, fundada en 2018, empezó como una pequeña tienda enfocada en artículos de jardinería y plásticos a precios de menudeo. Más tarde, comenzó a ofrecer descuentos al por mayor y un servicio de entrega a domicilio. Su éxito y expansión se reflejan en el crecimiento del personal de dos a seis empleados debido al aumento de la demanda.</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <img src="../recursos/pericoV.png" alt="Perico Verde" class="img-fluid rounded">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="container about-section">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h2>Mision</h2>
+                                            <p>Plásticos y Jarciería El Perico Verde, fundada en 2018, empezó como una pequeña tienda enfocada en artículos de jardinería y plásticos a precios de menudeo. Más tarde, comenzó a ofrecer descuentos al por mayor y un servicio de entrega a domicilio. Su éxito y expansión se reflejan en el crecimiento del personal de dos a seis empleados debido al aumento de la demanda.</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <img src="../recursos/pericoV.png" alt="Perico Verde" class="img-fluid rounded">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="container about-section">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h2>Vision</h2>
+                                            <p>Plásticos y Jarciería El Perico Verde, fundada en 2018, empezó como una pequeña tienda enfocada en artículos de jardinería y plásticos a precios de menudeo. Más tarde, comenzó a ofrecer descuentos al por mayor y un servicio de entrega a domicilio. Su éxito y expansión se reflejan en el crecimiento del personal de dos a seis empleados debido al aumento de la demanda.</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <img src="../recursos/pericoV.png" alt="Perico Verde" class="img-fluid rounded">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="container about-section">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h2>Valores</h2>
+                                            <p>Plásticos y Jarciería El Perico Verde, fundada en 2018, empezó como una pequeña tienda enfocada en artículos de jardinería y plásticos a precios de menudeo. Más tarde, comenzó a ofrecer descuentos al por mayor y un servicio de entrega a domicilio. Su éxito y expansión se reflejan en el crecimiento del personal de dos a seis empleados debido al aumento de la demanda.</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <img src="../recursos/pericoV.png" alt="Perico Verde" class="img-fluid rounded">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <div class="container">
+                <p>© 2024 Plásticos y Jarciería El Perico Verde. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="../estilos/bootstrap/js/bootstrap.bundle.js" type="text/javascript"></script>
+        <script src="../estilos/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="../estilos/bootstrap/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+        <script>
+                                function cerrarSesion() {
+                                    sessionStorage.clear(); // Eliminar toda la información del sessionStorage
+                                    Swal.fire({
+                                        icon: 'info',
+                                        title: 'Sesión Cerrada',
+                                        text: 'Has cerrado sesión exitosamente.'
+                                    }).then(() => {
+                                        // Redirigir al usuario a la página de inicio de sesión
+                                        window.location.href = "http://localhost:8080/PericoVerde/index.html";
+                                    });
+                                }
+        </script>
+        <!-- Bootstrap JS (Popper incluido) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2AHB1v1fHtHECFed4OBIDcCZUk9WtT9eRFFCW1CIMq0nMlFlnR8AjTQzSft" crossorigin="anonymous"></script>
+
+        <!-- SweetAlert -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+    </body>
+</html>
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------ Horarios.js---------------------------------
+
+
+
+let horarios = [];
+
+export async function inicializar() {
+    await refreshTableHorarios(); // Asegura que las tablas se carguen al iniciar
+}
+
+export async function guardarEntrada() {
+    let codigoEmpleado = document.getElementById('txtCodigoEmpleadoHorario').value;
+    let horaEntrada = document.getElementById('horaEntrada').value.trim();
+    let periodoEntrada = document.getElementById('selectorAmPmEntrada').value;
+
+    if (!codigoEmpleado || codigoEmpleado <= 0) {
+        Swal.fire('Error', 'Ingresa un código de empleado válido.', 'error');
+        return;
+    }
+
+    if (!horaEntrada) {
+        Swal.fire('Error', 'Debes ingresar una hora válida para registrar la entrada.', 'error');
+        return;
+    }
+
+    if (/^\d{1,2}$/.test(horaEntrada)) {
+        horaEntrada = `${horaEntrada}:00:00`;
+    } else if (/^\d{1,2}:\d{1,2}$/.test(horaEntrada)) {
+        horaEntrada = `${horaEntrada}:00`;
+    } else if (!esHoraValida(horaEntrada)) {
+        Swal.fire('Error', 'El formato de hora debe ser HH:MM:SS. Solo se permiten números y ":"', 'error');
+        return;
+    }
+
+    const horaConvertida = convertirHora(horaEntrada, periodoEntrada);
+
+    let url = "http://localhost:8080/PericoVerde/api/asistencia/entrada";
+    let params = new URLSearchParams();
+    params.append('codigoEmpleado', codigoEmpleado);
+    params.append('hora', horaConvertida);
+
+    try {
+        let resp = await fetch(url, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        });
+
+        if (!resp.ok) {
+            throw new Error('Error en la solicitud: ' + resp.status);
+        }
+
+        let data = await resp.json();
+
+        if (data.error) {
+            Swal.fire('Error al registrar entrada', data.error, 'warning');
+            return;
+        }
+
+        await refreshTableHorarios();
+        Swal.fire('Entrada Registrada', `Hora registrada: ${horaConvertida}`, 'success');
+        document.getElementById('horaEntrada').value = '';
+        
+        
+       
+        
+    } catch (error) {
+        console.error('Error al registrar entrada:', error);
+        Swal.fire('Error', 'Ocurrió un error al intentar registrar la entrada.', 'error');
+    }
+}
+
+
+
+
+
+
+export async function guardarSalida() {
+    let codigoEmpleado = document.getElementById('txtCodigoEmpleadoHorario').value;
+    let horaSalida = document.getElementById('horaSalida').value.trim();
+    let periodoSalida = document.getElementById('selectorAmPmSalida').value;
+
+    if (!codigoEmpleado || codigoEmpleado <= 0) {
+        Swal.fire('Error', 'Ingresa un código de empleado válido.', 'error');
+        return;
+    }
+
+    if (!horaSalida) {
+        Swal.fire('Error', 'Debes ingresar una hora válida para registrar la salida.', 'error');
+        return;
+    }
+
+    if (/^\d{1,2}$/.test(horaSalida)) {
+        horaSalida = `${horaSalida}:00:00`;
+    } else if (/^\d{1,2}:\d{1,2}$/.test(horaSalida)) {
+        horaSalida = `${horaSalida}:00`;
+    } else if (!esHoraValida(horaSalida)) {
+        Swal.fire('Error', 'El formato de hora debe ser HH:MM:SS. Solo se permiten números y ":"', 'error');
+        return;
+    }
+
+    const horaConvertida = convertirHora(horaSalida, periodoSalida);
+
+    let url = "http://localhost:8080/PericoVerde/api/asistencia/salida";
+    let params = new URLSearchParams();
+    params.append('codigoEmpleado', codigoEmpleado);
+    params.append('hora', horaConvertida);
+
+    try {
+        let resp = await fetch(url, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        });
+
+        if (!resp.ok) {
+            throw new Error('Error en la solicitud: ' + resp.status);
+        }
+
+        let data = await resp.json();
+
+        if (data.error) {
+            Swal.fire('Error al registrar salida', data.error, 'warning');
+            return;
+        }
+
+        await refreshTableHorarios();
+        Swal.fire('Salida Registrada', `Hora registrada: ${horaConvertida}`, 'success');
+        document.getElementById('horaSalida').value = '';
+        
+       
+        
+    } catch (error) {
+        console.error('Error al registrar salida:', error);
+        Swal.fire('Error', 'Ocurrió un error al intentar registrar la salida.', 'error');
+    }
+}
+
+export async function refreshTableHorarios() {
+    let url = "http://localhost:8080/PericoVerde/api/asistencia/getAll";
+    try {
+        let response = await fetch(url);
+        let data = await response.json();
+
+        if (data.error) {
+            Swal.fire('Error', data.error, 'warning');
+            return;
+        }
+
+        if (data.exception) {
+            Swal.fire('Error', data.exception, 'error');
+            return;
+        }
+
+        horarios = data;
+        fillTableHorarios();
+    } catch (error) {
+        console.error("Error al obtener los horarios: ", error);
+        Swal.fire('Error', 'Ocurrió un error al obtener los horarios. Por favor, inténtelo de nuevo.', 'error');
+    }
+}
+
+
+
+export async function fillTableHorarios() {
+    const hoy = new Date().toISOString().split('T')[0];
+    const semana = getWeekStart();
+    const mes = getMonthStart();
+
+    const filtroNombre = document.getElementById('filtroNombre').value.toLowerCase();
+    const filtroCodigo = document.getElementById('filtroCodigo').value;
+    const periodo = document.getElementById("selectPeriodo").value;
+
+    let contenido = "";
+
+    for (let i = 0; i < horarios.length; i++) {
+        if ((periodo === 'dia' && horarios[i].fecha === hoy ||
+             periodo === 'semana' && horarios[i].fecha >= semana ||
+             periodo === 'mes' && horarios[i].fecha >= mes) &&
+            (horarios[i].nombre.toLowerCase().includes(filtroNombre) &&
+             horarios[i].codigoEmpleado.toString().includes(filtroCodigo))) {
+
+            contenido += `<tr>
+                <td>${horarios[i].codigoEmpleado}</td>
+                <td>${horarios[i].nombre}</td>
+                <td>${horarios[i].apellidoPaterno}</td>
+                <td>${horarios[i].puesto}</td>
+                <td>${horarios[i].horaEntrada}</td>
+                <td>${horarios[i].horaSalida}</td>
+                <td>${horarios[i].fecha}</td>
+            </tr>`;
+        }
+    }
+
+    document.getElementById("tbodyAsistenciaDia").innerHTML = contenido;
+    document.getElementById("tbodyAsistenciaSemana").innerHTML = contenido;
+    document.getElementById("tbodyAsistenciaMes").innerHTML = contenido;
+}
+
+function esHoraValida(hora) {
+    const regex = /^([0-9]{1,2}):([0-9]{2}):([0-9]{2})$/;
+    return regex.test(hora);
+}
+
+function convertirHora(hora, periodo) {
+    let [h, m, s] = hora.split(':').map(Number);
+    if (h < 1 || h > 12 || m > 59 || s > 59) return null;
+
+    if (periodo === 'PM' && h !== 12) h += 12;
+    if (periodo === 'AM' && h === 12) h = 0;
+
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+function cerrarModal(modalId) {
+    const modal = document.querySelector(modalId);
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    if (modalInstance) modalInstance.hide();
+}
+
+function getWeekStart() {
+    const today = new Date();
+    const first = today.getDate() - today.getDay();
+    const firstDay = new Date(today.setDate(first));
+    return firstDay.toISOString().split('T')[0];
+}
+
+function getMonthStart() {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    return firstDay.toISOString().split('T')[0];
+}
+
+function limpiarFormularioHorario() {
+    document.getElementById('attendanceForm').reset();
+}
+
+function cambiarVista() {
+    let periodo = document.getElementById("selectPeriodo").value;
+    document.getElementById("vistaDia").style.display = periodo === "dia" ? "block" : "none";
+    document.getElementById("vistaSemana").style.display = periodo === "semana" ? "block" : "none";
+    document.getElementById("vistaMes").style.display = periodo === "mes" ? "block" : "none";
+
+    fillTableHorarios(); // Actualizar tabla al cambiar de vista
+}
+// Añadir eventos para filtros
+document.getElementById('filtroNombre').addEventListener('input', fillTableHorarios);
+document.getElementById('filtroCodigo').addEventListener('input', fillTableHorarios);
+
+window.guardarEntrada = guardarEntrada;
+window.guardarSalida = guardarSalida;
+window.refreshTableHorarios = refreshTableHorarios;
+window.fillTableHorarios = fillTableHorarios;
+window.cambiarVista = cambiarVista;
+
+
+
+-------------------------------------------------------------------------------------------moduloHorarios-- vistaHorarios.html-----------------
+
+
+
+
+<div class="container my-5">
+    <div class="contenedor">
+        <h2 class="text-center mb-4">Registrar Horario</h2>
+        <form id="attendanceForm">
+            <div class="row mb-3">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label for="txtCodigoEmpleadoHorario" class="form-label me-2">Código de Empleado</label>
+                    <input type="number" class="form-control me-2" id="txtCodigoEmpleadoHorario" name="codigoEmpleado" required>
+                    <button type="button" class="btn btn-custom" onclick="cargarModuloEmpleados()">Buscar código</button>
+                    <small class="text-muted ms-2">¿Olvidaste el código? Búscalo aquí.</small>
+                </div>
+                <div class="col-md-6">
+                    <div class="button-container text-md-end mt-3 mt-md-0">
+                        <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#modalEntrada">Registrar Entrada</button>
+                        <button type="button" class="btn btn-custom ms-2" data-bs-toggle="modal" data-bs-target="#modalSalida">Registrar Salida</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="contenedor table-container mt-5">
+        <h2 class="text-center mb-4">Registro de Horarios</h2>
+
+        <!-- Campos de búsqueda -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <input type="text" id="filtroNombre" class="form-control" placeholder="Buscar por nombre">
+            </div>
+            <div class="col-md-4">
+                <input type="number" id="filtroCodigo" class="form-control" placeholder="Buscar por código de empleado">
+            </div>
+            <div class="col-md-4">
+                <select id="selectPeriodo" class="form-select" onchange="cambiarVista()">
+                    <option value="dia">Asistencia del Día</option>
+                    <option value="semana">Asistencia de la Semana</option>
+                    <option value="mes">Asistencia del Mes</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Secciones para diferentes períodos -->
+        <div id="vistaDia">
+            <h3>Asistencia del Día</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Código del Empleado</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Puesto</th>
+                            <th>Hora de Entrada</th>
+                            <th>Hora de Salida</th>
+                            <th>Día</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyAsistenciaDia">
+                        <!-- Los datos de la asistencia del día se llenarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="vistaSemana" style="display: none;">
+            <h3>Asistencia de la Semana</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Código del Empleado</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Puesto</th>
+                            <th>Hora de Entrada</th>
+                            <th>Hora de Salida</th>
+                            <th>Día</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyAsistenciaSemana">
+                        <!-- Los datos de la asistencia de la semana se llenarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="vistaMes" style="display: none;">
+            <h3>Asistencia del Mes</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Código del Empleado</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Puesto</th>
+                            <th>Hora de Entrada</th>
+                            <th>Hora de Salida</th>
+                            <th>Día</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyAsistenciaMes">
+                        <!-- Los datos de la asistencia del mes se llenarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Registrar Entrada -->
+<div class="modal fade" id="modalEntrada" tabindex="-1" aria-labelledby="modalEntradaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalEntradaLabel">Registrar Hora de Entrada</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEntrada">
+                    <div class="mb-3">
+                        <label for="horaEntrada" class="form-label">Hora de Entrada</label>
+                        <input type="text" class="form-control" id="horaEntrada" placeholder="Ejemplo: 8 o 8:10" required>
+                        <small class="text-muted">Ingrese la hora en formato HH o HH:MM. Se ajustará automáticamente a HH:MM:SS.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="selectorAmPmEntrada" class="form-label">Periodo</label>
+                        <select id="selectorAmPmEntrada" class="form-select">
+                            <option value="AM" selected>AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="guardarEntrada()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Registrar Salida -->
+<div class="modal fade" id="modalSalida" tabindex="-1" aria-labelledby="modalSalidaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalSalidaLabel">Registrar Hora de Salida</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formSalida">
+                    <div class="mb-3">
+                        <label for="horaSalida" class="form-label">Hora de Salida</label>
+                        <input type="text" class="form-control" id="horaSalida" placeholder="Ejemplo: 15 o 15:30" required>
+                        <small class="text-muted">Ingrese la hora en formato HH o HH:MM. Se ajustará automáticamente a HH:MM:SS.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="selectorAmPmSalida" class="form-label">Periodo</label>
+                        <select id="selectorAmPmSalida" class="form-select">
+                            <option value="AM">AM</option>
+                            <option value="PM" selected>PM</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarSalida()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------ fin----------------------------------

@@ -1,0 +1,164 @@
+-- -----------------------------------------------------
+-- Version:     2.0
+-- Date:        2024-07-12 
+-- Author:      Campos Pacheco Carlos Angus, 
+--              Yael Lopez Mariano
+-- Email:       carlosanguscp@gmail.com,
+--              yaellopezmariano@gmail.com
+-- Comments:    
+-- -----------------------------------------------------
+
+CREATE DATABASE pericoVerde;
+USE pericoVerde;
+
+-- -----------------------------------------------------
+-- Tabla Usuarios
+-- -----------------------------------------------------
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) NOT NULL,
+    contrasenia VARCHAR(100) NOT NULL
+);
+
+INSERT INTO usuarios (nombre_usuario, contrasenia) 
+VALUES ('Javier', 'javiercarpio01');
+-- -----------------------------------------------------
+
+-- --------------------------------------------------------------------------------------------------------------------------------------
+-- Tabla Clientes
+-- --------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE clientes (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido_paterno VARCHAR(50) NOT NULL,
+    apellido_materno VARCHAR(50) NOT NULL,
+    genero VARCHAR(10) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    rfc VARCHAR(13) NOT NULL,
+    curp VARCHAR(18) NOT NULL,
+    domicilio VARCHAR(255) NOT NULL,
+    codigo_postal VARCHAR(10) NOT NULL,
+    ciudad VARCHAR(50) NOT NULL,
+    estado VARCHAR(50) NOT NULL,
+    telefono VARCHAR(15) NOT NULL,
+    fecha_registro DATE NOT NULL,
+    estatusCliente INT NOT NULL,
+    correo_electronico VARCHAR(100) NOT NULL
+);
+-- -----------------------------------------------------
+-- INSERT Clientes
+-- -----------------------------------------------------
+INSERT INTO clientes (nombre, apellido_paterno, apellido_materno, genero, fecha_nacimiento, rfc, curp, domicilio, codigo_postal, ciudad, estado, telefono, fecha_registro, estatusCliente, correo_electronico) 
+VALUES 
+('Carlos', 'Gómez', 'López', 'M', '1985-04-23', 'GOLC850423HDF', 'GOLC850423HDFRSL09', 'Calle Falsa 123', '01234', 'Ciudad de México', 'CDMX', '5512345678', '2024-06-21', 1, 'carlos.gomez@example.com'),
+('María', 'Hernández', 'Pérez', 'F', '1990-07-15', 'HEPM900715MMC', 'HEPM900715MMCLRS05', 'Avenida Siempre Viva 456', '56789', 'Guadalajara', 'Jalisco', '3312345678', '2024-06-21', 1, 'maria.hernandez@example.com'),
+('Juan', 'Martínez', 'Ramírez', 'M', '1982-11-10', 'MARA821110HDF', 'MARA821110HDFRRM08', 'Calle Inventada 789', '34567', 'Monterrey', 'Nuevo León', '8187654321', '2024-06-21', 1, 'juan.martinez@example.com'),
+('Ana', 'Sánchez', 'García', 'F', '1995-03-05', 'SAGA950305MDF', 'SAGA950305MDFRNL04', 'Boulevard Inexistente 101', '78901', 'Puebla', 'Puebla', '2223456789', '2024-06-21', 1, 'ana.sanchez@example.com'),
+('Luis', 'Rodríguez', 'Fernández', 'M', '1988-12-25', 'ROFL881225HDF', 'ROFL881225HDFRLS01', 'Avenida No Real 202', '23456', 'Querétaro', 'Querétaro', '4424567890', '2024-06-21', 1, 'luis.rodriguez@example.com');
+
+
+
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+-- Tabla Proveedores
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE proveedores (
+    id_proveedor INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    tipo_proveedor VARCHAR(100) NOT NULL,
+    rfc VARCHAR(13) NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    codigo_postal VARCHAR(10) NOT NULL,
+    ciudad VARCHAR(50) NOT NULL,
+    estado VARCHAR(50) NOT NULL,
+    telefono VARCHAR(15) NOT NULL,
+    estatusProveedores INT NOT NULL,
+    correo_electronico VARCHAR(100) NOT NULL
+);
+
+-- -----------------------------------------------------
+-- Tabla Empleados
+-- -----------------------------------------------------
+CREATE TABLE empleados (
+    id_empleado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido_paterno VARCHAR(50) NOT NULL,
+    apellido_materno VARCHAR(50) NOT NULL,
+    genero VARCHAR(10) NOT NULL,
+    fecha_nacimiento VARCHAR(15) NOT NULL,
+    rfc VARCHAR(20) NOT NULL,
+    curp VARCHAR(20) NOT NULL,
+    domicilio VARCHAR(255) NOT NULL,
+    codigo_postal INT NOT NULL,
+    ciudad VARCHAR(50) NOT NULL,
+    estado VARCHAR(50) NOT NULL,
+    telefono BIGINT NOT NULL,
+    fecha_ingreso VARCHAR(15),
+    puesto VARCHAR (100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    codigo_empleado INT NOT NULL,
+    id_usuario INT,
+    estatusEmpleado INT NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+INSERT INTO empleados (
+    id_empleado, nombre, apellido_paterno, apellido_materno, genero, fecha_nacimiento, 
+    rfc, curp, domicilio, codigo_postal, ciudad, estado, telefono, 
+    fecha_ingreso, puesto, email, codigo_empleado, id_usuario, estatusEmpleado
+) VALUES (
+    1, 'Juan', 'Pérez', 'González', 'Masculino', '1985-06-15', 
+    'PEJG850615HDFRNZ09', 'PEJG850615HDFRNZ09', 'Calle Falsa 123', '12345', 'Ciudad de México', 
+    'CDMX', '55512', '2024-01-01', 'Gerente', 'juan.perez@example.com', '111123', 
+    1, 1
+);
+USE pericoVerde;
+
+-- Insertar empleados
+INSERT INTO empleados (nombre, apellido_paterno, apellido_materno, genero, fecha_nacimiento, rfc, curp, domicilio, codigo_postal, ciudad, estado, telefono, fecha_ingreso, puesto, email, codigo_empleado, id_usuario, estatusEmpleado) VALUES
+('Carlos', 'Pacheco', 'Campos', 'M', '1990-05-20', 'PACG900520', 'PACG900520HDFRRL01', 'Calle Falsa 123', 12345, 'Ciudad de México', 'CDMX', 1234567890, '2022-01-15', 'Desarrollador', 'carlos@empresa.com', 1001, 1, 1),
+('Ana', 'López', 'García', 'F', '1988-11-10', 'LOGA881110', 'LOGA881110MDFRRL01', 'Av. Siempre Viva 742', 67890, 'Ciudad de México', 'CDMX', 9876543210, '2021-06-20', 'Diseñadora', 'ana@empresa.com', 1002, 1, 1),
+('Juan', 'Martínez', 'Pérez', 'M', '1992-03-15', 'MAPJ920315', 'MAPJ920315HDFRRL01', 'Calle Rosales 45', 54321, 'Ciudad de México', 'CDMX', 1122334455, '2020-03-01', 'Analista', 'juan@empresa.com', 1003, 1, 1);
+
+
+CREATE TABLE Asistencias (
+    idAsistencia INT PRIMARY KEY AUTO_INCREMENT,
+    codigoEmpleado INT,
+    fecha DATE,
+    horaEntrada TIME,
+    horaSalida TIME
+   
+);
+
+-- Insertar asistencias
+INSERT INTO Asistencias (codigoEmpleado, fecha, horaEntrada, horaSalida) VALUES
+(1001, '2024-06-30', '09:00:00', '18:00:00'),
+(1002, '2024-06-30', '09:30:00', '18:30:00'),
+(1003, '2024-06-30', '08:45:00', '17:45:00'),
+(1001, '2024-07-01', '09:00:00', '18:00:00'),
+(1002, '2024-07-01', '09:30:00', '18:30:00'),
+(1003, '2024-07-01', '08:45:00', '17:45:00'),
+(1001, '2024-07-02', '09:00:00', '18:00:00'),
+(1002, '2024-07-02', '09:30:00', '18:30:00'),
+(1003, '2024-07-02', '08:45:00', '17:45:00'),
+(1001, '2024-07-03', '09:00:00', '18:00:00'),
+(1002, '2024-07-03', '09:30:00', '18:30:00'),
+(1003, '2024-07-03', '08:45:00', '17:45:00'),
+(1001, '2024-07-04', '09:00:00', '18:00:00'),
+(1002, '2024-07-04', '09:30:00', '18:30:00'),
+(1003, '2024-07-04', '08:45:00', '17:45:00');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

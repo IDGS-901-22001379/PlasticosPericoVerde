@@ -1,0 +1,83 @@
+<div class="container my-5">
+    <div class="contenedor">
+        <h2 class="text-center mb-4">Gestión de Proveedores</h2>
+        <form id="proveedorForm">
+            <input type="hidden" id="txtIdProveedor" name="idProveedor" value="0">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="txtNombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="txtNombre" name="nombre" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtTipoProveedor" class="form-label">Tipo de Proveedor</label>
+                    <input type="text" class="form-control" id="txtTipoProveedor" name="tipoProveedor" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtRfc" class="form-label">RFC</label>
+                    <input type="text" class="form-control" id="txtRfc" name="rfc" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="txtTelefono" class="form-label">Teléfono</label>
+                    <input type="text" class="form-control" id="txtTelefono" name="telefono" required>
+                </div>
+                <div class="col-md_4">
+                    <label for="txtDireccion" class="form-label">Dirección</label>
+                    <input type="text" class="form-control" id="txtDireccion" name="direccion" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtCodigoPostal" class="form-label">Código Postal</label>
+                    <input type="text" class="form-control" id="txtCodigoPostal" name="codigoPostal" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="txtCiudad" class="form-label">Ciudad</label>
+                    <input type="text" class="form-control" id="txtCiudad" name="ciudad" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtEstado" class="form-label">Estado</label>
+                    <input type="text" class="form-control" id="txtEstado" name="estado" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtEstatusProveedores" class="form-label">Estatus</label>
+                    <input type="number" class="form-control" id="txtEstatusProveedores" name="estatusProveedores" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="txtCorreoElectronico" class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="txtCorreoElectronico" name="correoElectronico" required>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-custom" onclick="modulo.saveProveedor()">Guardar</button>
+                <button type="button" class="btn btn-danger" onclick="modulo.deleteProveedor()">Eliminar</button>
+                <button type="button" class="btn btn-success" onclick="modulo.resetProveedorForm()">Nuevo</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="contenedor table-container mt-5">
+        <h2 class="text-center mb-4">Lista de Proveedores</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID Proveedor</th>
+                    <th>Nombre</th>
+                    <th>Tipo de Proveedor</th>
+                    <th>RFC</th>
+                    <th>Ciudad</th>
+                    <th>Estado</th>
+                    <th>Teléfono</th>
+                    <th>Correo Electrónico</th>
+                    <th>Estatus</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyProveedores">
+                <!-- Los datos de los proveedores se llenarán aquí -->
+            </tbody>
+        </table>
+    </div>
+</div>

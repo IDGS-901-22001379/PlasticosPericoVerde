@@ -1,0 +1,103 @@
+<div class="container my-5">
+    <div class="contenedor">
+        <h2 class="text-center mb-4">Insertar Cliente</h2>
+        <form id="clienteForm">
+            <input type="hidden" id="txtIdCliente" name="idCliente">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="txtNombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="txtNombre" name="nombre" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtApellidoPaterno" class="form-label">Apellido Paterno</label>
+                    <input type="text" class="form-control" id="txtApellidoPaterno" name="apellidoPaterno" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtApellidoMaterno" class="form-label">Apellido Materno</label>
+                    <input type="text" class="form-control" id="txtApellidoMaterno" name="apellidoMaterno" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label for="txtGenero" class="form-label">Género</label>
+                    <select class="form-select" id="txtGenero" name="genero" required>
+                        <option value="">Seleccionar</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="txtFechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control" id="txtFechaNacimiento" name="fechaNacimiento" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="txtDomicilio" class="form-label">Domicilio</label>
+                    <input type="text" class="form-control" id="txtDomicilio" name="domicilio" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="txtRfc" class="form-label">RFC</label>
+                    <input type="text" class="form-control" id="txtRfc" name="rfc" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="txtCurp" class="form-label">CURP</label>
+                    <input type="text" class="form-control" id="txtCurp" name="curp" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="txtCodigoPostal" class="form-label">Código Postal</label>
+                    <input type="number" class="form-control" id="txtCodigoPostal" name="codigoPostal" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtCiudad" class="form-label">Ciudad</label>
+                    <input type="text" class="form-control" id="txtCiudad" name="ciudad" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtEstado" class="form-label">Estado</label>
+                    <input type="text" class="form-control" id="txtEstado" name="estado" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="txtTelefono" class="form-label">Teléfono</label>
+                    <input type="number" class="form-control" id="txtTelefono" name="telefono" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtFechaRegistro" class="form-label">Fecha de Registro</label>
+                    <input type="date" class="form-control" id="txtFechaRegistro" name="fechaRegistro" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="txtCorreoElectronico" class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="txtCorreoElectronico" name="correoElectronico" required>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-custom" onclick="modulo.saveCliente()">Guardar</button>
+                <button type="button" class="btn btn-danger" onclick="modulo.deleteCliente()">Eliminar</button>
+                <button type="button" class="btn btn-success" onclick="modulo.resetForm()">Nuevo</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="contenedor table-container mt-5">
+        <h2 class="text-center mb-4">Lista de Clientes</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Fecha de Registro</th>
+                    <th>Correo Electrónico</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyClientes">
+                <!-- Los datos de los clientes se llenarán aquí -->
+            </tbody>
+        </table>
+    </div>
+</div>

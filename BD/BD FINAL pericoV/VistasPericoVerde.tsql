@@ -1,0 +1,105 @@
+-- -----------------------------------------------------
+-- Version:     2.0
+-- Date:        2024-07-12 
+-- Author:      Campos Pacheco Carlos Angus, 
+--              Yael Lopez Mariano
+-- Email:       carlosanguscp@gmail.com,
+--              yaellopezmariano@gmail.com
+
+-- Comments:  Vistas    empleados,clientes,proveedores,Asistencias
+-- -----------------------------------------------------
+
+
+USE pericoVerde;
+
+
+
+
+-- -----------------------------------------------------
+-- Vista de clientes
+-- -----------------------------------------------------
+
+CREATE VIEW vista_clientes AS
+SELECT
+    id_cliente AS `ID Cliente`,
+    nombre AS `Nombre`,
+    apellido_paterno AS `Apellido Paterno`,
+    apellido_materno AS `Apellido Materno`,
+    fecha_registro AS `Fecha de Registro`,
+    correo_electronico AS `Correo Electrónico`,
+    telefono AS `Teléfono`,
+    estado AS `Estado`
+FROM
+    clientes;
+	
+
+-- -----------------------------------------------------
+-- Vista para la tabla proveedores
+-- -----------------------------------------------------
+CREATE VIEW vista_proveedores AS
+SELECT
+    id_proveedor AS `ID Proveedor`,
+    nombre AS `Nombre`,
+    tipo_proveedor AS `Tipo de Proveedor`,
+    rfc AS `RFC`,
+    direccion AS `Dirección`,
+    codigo_postal AS `Código Postal`,
+    ciudad AS `Ciudad`,
+    estado AS `Estado`,
+    telefono AS `Teléfono`,
+    estatusProveedores AS `Estatus`,
+    correo_electronico AS `Correo Electrónico`
+FROM
+    proveedores;
+	
+	
+Vista empleado
+------------------------------------------
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `pericoverde`.`v_empleado` AS
+    SELECT 
+        `pericoverde`.`empleados`.`id_empleado` AS `id_empleado`,
+        `pericoverde`.`empleados`.`nombre` AS `nombre`,
+        `pericoverde`.`empleados`.`apellido_paterno` AS `apellido_paterno`,
+        `pericoverde`.`empleados`.`apellido_materno` AS `apellido_materno`,
+        `pericoverde`.`empleados`.`genero` AS `genero`,
+        `pericoverde`.`empleados`.`fecha_nacimiento` AS `fecha_nacimiento`,
+        `pericoverde`.`empleados`.`rfc` AS `rfc`,
+        `pericoverde`.`empleados`.`curp` AS `curp`,
+        `pericoverde`.`empleados`.`domicilio` AS `domicilio`,
+        `pericoverde`.`empleados`.`codigo_postal` AS `codigo_postal`,
+        `pericoverde`.`empleados`.`ciudad` AS `ciudad`,
+        `pericoverde`.`empleados`.`estado` AS `estado`,
+        `pericoverde`.`empleados`.`telefono` AS `telefono`,
+        `pericoverde`.`empleados`.`fecha_ingreso` AS `fecha_ingreso`,
+        `pericoverde`.`empleados`.`puesto` AS `puesto`,
+        `pericoverde`.`empleados`.`email` AS `email`,
+        `pericoverde`.`empleados`.`codigo_empleado` AS `codigo_empleado`,
+        `pericoverde`.`empleados`.`estatusEmpleado` AS `estatusEmpleado`
+    FROM
+        `pericoverde`.`empleados`
+
+--------------------------------------
+Vista horarios
+-------------------------------------
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `pericoverde`.`v_horarios` AS
+    SELECT 
+        `a`.`idAsistencia` AS `idAsistencia`,
+        `a`.`codigoEmpleado` AS `codigoEmpleado`,
+        `e`.`nombre` AS `nombre`,
+        `e`.`apellido_paterno` AS `apellido_paterno`,
+        `e`.`apellido_materno` AS `apellido_materno`,
+        `e`.`puesto` AS `puesto`,
+        `a`.`fecha` AS `fecha`,
+        `a`.`horaEntrada` AS `horaEntrada`,
+        `a`.`horaSalida` AS `horaSalida`
+    FROM
+        (`pericoverde`.`asistencias` `a`
+        JOIN `pericoverde`.`empleados` `e` ON ((`a`.`codigoEmpleado` = `e`.`codigo_empleado`)))

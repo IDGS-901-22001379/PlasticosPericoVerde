@@ -1,0 +1,112 @@
+<div class="container my-5">
+    <div class="contenedor">
+        <h2 class="text-center mb-4">Insertar Empleado</h2>
+        <form id="employeeForm">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="txtNombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="txtNombre" name="nombre">
+                </div>
+                <div class="col-md-4">
+                    <label for="txtApellidoPaterno" class="form-label">Apellido Paterno</label>
+                    <input type="text" class="form-control" id="txtApellidoPaterno" name="apellidoPaterno">
+                </div>
+                <div class="col-md-4">
+                    <label for="txtApellidoMaterno" class="form-label">Apellido Materno</label>
+                    <input type="text" class="form-control" id="txtApellidoMaterno" name="apellidoMaterno">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label for="txtGenero" class="form-label">Género</label>
+                    <select class="form-select" id="txtGenero" name="genero">
+                        <option value="">Seleccionar</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="txtFechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control" id="txtFechaNacimiento" name="fechaNacimiento">
+                </div>
+                <div class="col-md-6">
+                    <label for="txtDomicilio" class="form-label">Domicilio</label>
+                    <input type="text" class="form-control" id="txtDomicilio" name="domicilio">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="txtRfc" class="form-label">RFC</label>
+                    <input type="text" class="form-control" id="txtRfc" name="rfc">
+                </div>
+                <div class="col-md-6">
+                    <label for="txtCurp" class="form-label">CURP</label>
+                    <input type="text" class="form-control" id="txtCurp" name="curp">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="txtCodigoPostal" class="form-label">Código Postal</label>
+                    <input type="number" class="form-control" id="txtCodigoPostal" name="codigoPostal">
+                </div>
+                <div class="col-md-4">
+                    <label for="txtCiudad" class="form-label">Ciudad</label>
+                    <input type="text" class="form-control" id="txtCiudad" name="ciudad">
+                </div>
+                <div class="col-md-4">
+                    <label for="txtEstado" class="form-label">Estado</label>
+                    <input type="text" class="form-control" id="txtEstado" name="estado">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="txtTelefono" class="form-label">Teléfono</label>
+                    <input type="number" class="form-control" id="txtTelefono" name="telefono">
+                </div>
+                <div class="col-md-4">
+                    <label for="txtFechaIngreso" class="form-label">Fecha de Ingreso</label>
+                    <input type="date" class="form-control" id="txtFechaIngreso" name="fechaIngreso">
+                </div>
+                <div class="col-md-4">
+                    <label for="txtPuesto" class="form-label">Puesto</label>
+                    <input type="text" class="form-control" id="txtPuesto" name="puesto">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="txtEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="txtEmail" name="email">
+                </div>
+                <div class="col-md-6">
+                    <label for="txtCodigoEmpleado" class="form-label">Código de Empleado</label>
+                    <input type="text" class="form-control" id="txtCodigoEmpleado" name="codigoEmpleado" readonly>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-custom me-2" onclick="modulo.save()">Guardar</button>
+                <button type="button" class="btn btn-danger me-2" onclick="modulo.deleteEmpleado()">Eliminar</button>
+                <button type="button" class="btn btn-primary" onclick="modulo.clearForm()">Nuevo</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="contenedor table-container mt-5">
+        <h2 class="text-center mb-4">Lista de Empleados</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Fecha de Ingreso</th>
+                    <th>Puesto</th>
+                    <th>Código de Empleado</th>
+                    
+                </tr>
+            </thead>
+            <tbody id="tbodyEmpleados">
+                <!-- Los datos de los empleados se llenarán aquí -->
+            </tbody>
+        </table>
+    </div>
+</div>

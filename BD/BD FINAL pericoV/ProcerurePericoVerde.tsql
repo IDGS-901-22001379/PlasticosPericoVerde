@@ -1,0 +1,261 @@
+-- -----------------------------------------------------
+-- Version:     2.0
+-- Date:        2024-07-12 
+-- Author:      Campos Pacheco Carlos Angus, 
+--              Yael Lopez Mariano
+-- Email:       carlosanguscp@gmail.com,
+--              yaellopezmariano@gmail.com
+
+-- Comments:  PROCEDURE    empleados,clientes,proveedores,Asistencias
+-- -----------------------------------------------------
+
+
+
+
+-- ----------------------------------------------------------------------------------------------------------------------------------------------------
+-- Procedimiento para insertar un nuevo cliente
+-- ES importante crear el PROCEDURE en la parte de PROCEDURE en la base de datos
+-- ----------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertarCliente`(
+    IN p_nombre VARCHAR(50),
+    IN p_apellido_paterno VARCHAR(50),
+    IN p_apellido_materno VARCHAR(50),
+    IN p_genero VARCHAR(10),
+    IN p_fecha_nacimiento DATE,
+    IN p_rfc VARCHAR(13),
+    IN p_curp VARCHAR(18),
+    IN p_domicilio VARCHAR(255),
+    IN p_codigo_postal VARCHAR(10),
+    IN p_ciudad VARCHAR(50),
+    IN p_estado VARCHAR(50),
+    IN p_telefono VARCHAR(15),
+    IN p_fecha_registro DATE,
+    IN p_estatusCliente INT,
+    IN p_correo_electronico VARCHAR(100),
+    OUT p_id_cliente INT
+)
+BEGIN
+    INSERT INTO clientes (
+        nombre, apellido_paterno, apellido_materno, genero, fecha_nacimiento, rfc, curp, domicilio, codigo_postal, ciudad, estado, telefono, fecha_registro, estatusCliente, correo_electronico
+    ) VALUES (
+        p_nombre, p_apellido_paterno, p_apellido_materno, p_genero, p_fecha_nacimiento, p_rfc, p_curp, p_domicilio, p_codigo_postal, p_ciudad, p_estado, p_telefono, p_fecha_registro, p_estatusCliente, p_correo_electronico
+    );
+    
+    SET p_id_cliente = LAST_INSERT_ID();
+END
+
+-- ----------------------------------------------------------------
+-- Procedimiento para modificar un cliente existente
+-- ES importante crear el PROCEDURE en la parte de PROCEDURE en la base de datos
+-- ----------------------------------------------------------------
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `modificarCliente`(
+    IN p_id_cliente INT,
+    IN p_nombre VARCHAR(50),
+    IN p_apellido_paterno VARCHAR(50),
+    IN p_apellido_materno VARCHAR(50),
+    IN p_genero VARCHAR(10),
+    IN p_fecha_nacimiento DATE,
+    IN p_rfc VARCHAR(13),
+    IN p_curp VARCHAR(18),
+    IN p_domicilio VARCHAR(255),
+    IN p_codigo_postal VARCHAR(10),
+    IN p_ciudad VARCHAR(50),
+    IN p_estado VARCHAR(50),
+    IN p_telefono VARCHAR(15),
+    IN p_fecha_registro DATE,
+    IN p_estatusCliente INT,
+    IN p_correo_electronico VARCHAR(100)
+)
+BEGIN
+    UPDATE clientes
+    SET
+        nombre = p_nombre,
+        apellido_paterno = p_apellido_paterno,
+        apellido_materno = p_apellido_materno,
+        genero = p_genero,
+        fecha_nacimiento = p_fecha_nacimiento,
+        rfc = p_rfc,
+        curp = p_curp,
+        domicilio = p_domicilio,
+        codigo_postal = p_codigo_postal,
+        ciudad = p_ciudad,
+        estado = p_estado,
+        telefono = p_telefono,
+        fecha_registro = p_fecha_registro,
+        estatusCliente = p_estatusCliente,
+        correo_electronico = p_correo_electronico
+    WHERE id_cliente = p_id_cliente;
+END
+
+-- -----------------------------------------------------
+-- Procedimiento para Eliminar un Cliente
+-- ES importante crear el PROCEDURE en la parte de PROCEDURE en la base de datos
+-- -----------------------------------------------------
+	CREATE DEFINER=`root`@`localhost` PROCEDURE `eliminarCliente`(
+    IN p_id_cliente INT
+)
+BEGIN
+    DELETE FROM clientes
+    WHERE id_cliente = p_id_cliente;
+END
+
+
+
+
+
+-- --------------------------------------------------------------------------------------------------------------------------------------------
+-- Procedimiento para insertar un nuevo proveedor
+-- ES importante crear el PROCEDURE en la parte de PROCEDURE en la base de datos
+-- ---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertarProveedor`(
+    IN p_nombre VARCHAR(100),
+    IN p_tipo_proveedor VARCHAR(100),
+    IN p_rfc VARCHAR(13),
+    IN p_direccion VARCHAR(255),
+    IN p_codigo_postal VARCHAR(10),
+    IN p_ciudad VARCHAR(50),
+    IN p_estado VARCHAR(50),
+    IN p_telefono VARCHAR(15),
+    IN p_estatusProveedores INT,
+    IN p_correo_electronico VARCHAR(100),
+    OUT p_id_proveedor INT
+)
+BEGIN
+    INSERT INTO proveedores (
+        nombre, tipo_proveedor, rfc, direccion, codigo_postal, ciudad, estado, telefono, estatusProveedores, correo_electronico
+    ) VALUES (
+        p_nombre, p_tipo_proveedor, p_rfc, p_direccion, p_codigo_postal, p_ciudad, p_estado, p_telefono, p_estatusProveedores, p_correo_electronico
+    );
+    
+    SET p_id_proveedor = LAST_INSERT_ID();
+END
+
+-- -----------------------------------------------------
+-- Procedimiento para modificar un proveedor existente
+-- ES importante crear el PROCEDURE en la parte de PROCEDURE en la base de datos
+-- -----------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `modificarProveedor`(
+    IN p_id_proveedor INT,
+    IN p_nombre VARCHAR(100),
+    IN p_tipo_proveedor VARCHAR(100),
+    IN p_rfc VARCHAR(13),
+    IN p_direccion VARCHAR(255),
+    IN p_codigo_postal VARCHAR(10),
+    IN p_ciudad VARCHAR(50),
+    IN p_estado VARCHAR(50),
+    IN p_telefono VARCHAR(15),
+    IN p_estatusProveedores INT,
+    IN p_correo_electronico VARCHAR(100)
+)
+BEGIN
+    UPDATE proveedores
+    SET
+        nombre = p_nombre,
+        tipo_proveedor = p_tipo_proveedor,
+        rfc = p_rfc,
+        direccion = p_direccion,
+        codigo_postal = p_codigo_postal,
+        ciudad = p_ciudad,
+        estado = p_estado,
+        telefono = p_telefono,
+        estatusProveedores = p_estatusProveedores,
+        correo_electronico = p_correo_electronico
+    WHERE id_proveedor = p_id_proveedor;
+END 
+-- -----------------------------------------------------
+-- Procedimiento DE ELIMINACION
+-- ES importante crear el PROCEDURE en la parte de PROCEDURE en la base de datos 
+-- -----------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `eliminarProveedor`(
+    IN p_id_proveedor INT
+)
+BEGIN
+    DELETE FROM proveedores
+    WHERE id_proveedor = p_id_proveedor;
+END 
+
+
+
+
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+-- Procedimiento insertarEmpleado
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertarEmpleado`(
+   IN var_nombre VARCHAR(50),
+    IN var_apellido_paterno VARCHAR(50),
+    IN var_apellido_materno VARCHAR(50),
+    IN var_genero VARCHAR(10),
+    IN var_fecha_nacimiento VARCHAR(15),
+    IN var_rfc VARCHAR(20),
+    IN var_curp VARCHAR(20),
+    IN var_domicilio VARCHAR(255),
+    IN var_codigo_postal INT,
+    IN var_ciudad VARCHAR(50),
+    IN var_estado VARCHAR(50),
+    IN var_telefono VARCHAR (10),
+    IN var_fecha_ingreso VARCHAR(15),
+    IN var_puesto VARCHAR(100),
+    IN var_email VARCHAR(100),
+    IN var_codigo_empleado VARCHAR (10),
+    OUT var_id_empleado INT
+)
+BEGIN
+    DECLARE existing_id INT;
+
+    -- Verificar si el empleado ya existe
+    SELECT id_empleado INTO existing_id
+    FROM empleados
+    WHERE codigo_empleado = var_codigo_empleado;
+
+    IF existing_id IS NOT NULL THEN
+        -- Si el empleado existe, actualizar la información
+        UPDATE empleados
+        SET nombre = var_nombre,
+            apellido_paterno = var_apellido_paterno,
+            apellido_materno = var_apellido_materno,
+            genero = var_genero,
+            fecha_nacimiento = var_fecha_nacimiento,
+            rfc = var_rfc,
+            curp = var_curp,
+            domicilio = var_domicilio,
+            codigo_postal = var_codigo_postal,
+            ciudad = var_ciudad,
+            estado = var_estado,
+            telefono = var_telefono,
+            fecha_ingreso = var_fecha_ingreso,
+            puesto = var_puesto,
+            email = var_email,
+            estatusEmpleado = 1
+        WHERE codigo_empleado = var_codigo_empleado;
+        
+        SET var_id_empleado = existing_id;
+    ELSE
+        -- Si el empleado no existe, insertar un nuevo registro
+        INSERT INTO empleados (
+            nombre, apellido_paterno, apellido_materno, genero, fecha_nacimiento, rfc, curp, domicilio, 
+            codigo_postal, ciudad, estado, telefono, fecha_ingreso, puesto, email, codigo_empleado, estatusEmpleado
+        ) VALUES (
+            var_nombre, var_apellido_paterno, var_apellido_materno, var_genero, var_fecha_nacimiento, var_rfc, var_curp, var_domicilio,
+            var_codigo_postal, var_ciudad, var_estado, var_telefono, var_fecha_ingreso, var_puesto, var_email, var_codigo_empleado, 1
+        );
+        
+        -- Crear un usuario con el nombre de empleado y puesto como contraseña
+        INSERT INTO usuarios (nombre_usuario, contrasenia)
+        VALUES (var_nombre, var_codigo_empleado);
+
+        -- Obtener el ID del último empleado insertado
+        SET var_id_empleado = LAST_INSERT_ID();
+    END IF;
+END
+
+
+
+
+
+
+
